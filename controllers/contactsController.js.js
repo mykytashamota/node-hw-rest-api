@@ -1,15 +1,15 @@
-import contactsService from "../models/contacts.js";
 import { HttpError } from "../helpers/index.js";
 import wrapController from "../decorators/controllerWrapper.js";
+import Contact from "../models/contacts.js";
 
 const getAll = async (req, res, next) => {
-  const result = await contactsService.listContacts();
+  const result = await Contact.find();
   res.json(result);
 };
 
 const getByID = async (req, res, next) => {
   const { contactId } = req.params;
-  const result = await contactsService.getContactByID(contactId);
+  const result = await Contact.findById(contactId);
   if (!result) {
     return next(HttpError(404, "Not found"));
   }
@@ -17,13 +17,13 @@ const getByID = async (req, res, next) => {
 };
 
 const add = async (req, res, next) => {
-  const result = await contactsService.addContact(req.body);
+  const result = await Contact.create(req.body);
   res.status(201).json(result);
 };
 
 const deleteByID = async (req, res, next) => {
   const { contactId } = req.params;
-  const result = await contactsService.removeContact(contactId);
+  const result = await Contact.findByIdAndDelete(contactId);
   if (!result) {
     return next(HttpError(404, "Not found"));
   }
@@ -32,7 +32,10 @@ const deleteByID = async (req, res, next) => {
 
 const update = async (req, res, next) => {
   const { contactId } = req.params;
-  const result = await contactsService.updateContactByID(contactId, req.body);
+  const result = await Contact.findByIdAndUpdate(contactId, req.body, {
+    new: true,
+    runValidators: true,
+  });
   if (!result) {
     return next(HttpError(404, "Not found"));
   }

@@ -4,8 +4,6 @@ import app from "./app.js";
 
 const { DB_HOST } = process.env;
 
-// mongoose.set("strictQuery", true);
-
 mongoose
   .connect(DB_HOST)
   .then(() => {

@@ -4,20 +4,11 @@ import cors from "cors";
 import dotenv from "dotenv";
 
 import contactsRouter from "./routes/api/contacts.js";
-// import mongoose from "mongoose";
 dotenv.config();
 
 const app = express();
 
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
-
-// const DB_HOST =
-//   "mongodb+srv://mykytashamota:77443344Yt@cluster0.syw8owd.mongodb.net/db-contacts?retryWrites=true&w=majority";
-
-// mongoose
-//   .connect(DB_HOST)
-//   .then(() => console.log("Database connection successful"))
-//   .catch(error.message);
 
 app.use(logger(formatsLogger));
 app.use(cors());

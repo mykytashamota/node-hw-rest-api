@@ -1,58 +1,31 @@
-import fs from "fs/promises";
-import path from "path";
-import { nanoid } from "nanoid";
+import { Schema, model } from "mongoose";
+import { enableUpdateOptions, handleSaveError } from "./hooks.js";
 
-const contactsPath = path.resolve("models", "contacts.json");
+const contactSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: [true, "Set name for contact"],
+    },
+    email: {
+      type: String,
+    },
+    phone: {
+      type: String,
+    },
+    favorite: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { versionKey: false, timestamps: true }
+);
 
-const listContacts = async () => {
-  const contacts = await fs.readFile(contactsPath);
-  return JSON.parse(contacts);
-};
+contactSchema.post("save", handleSaveError);
 
-const getContactByID = async (id) => {
-  const contacts = await listContacts();
-  const contact = contacts.find((contact) => contact.id === id);
-  return contact ?? null;
-};
+contactSchema.pre("findOneAndUpdate", enableUpdateOptions);
+contactSchema.post("findOneAndUpdate", handleSaveError);
 
-const addContact = async (data) => {
-  const contacts = await listContacts();
-  const newContact = { ...data, id: nanoid() };
-  contacts.push(newContact);
-  fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-  return newContact;
-};
+const Contact = model("contact", contactSchema);
 
-const removeContact = async (id) => {
-  const contacts = await listContacts();
-  const idx = contacts.findIndex((contact) => contact.id === id);
-
-  if (idx === -1) {
-    return null;
-  }
-
-  const [removedContact] = contacts.splice(idx, 1);
-
-  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-
-  return removedContact;
-};
-
-const updateContactByID = async (id, data) => {
-  const contacts = await listContacts();
-  const idx = contacts.findIndex((contact) => contact.id === id);
-  if (idx === -1) {
-    return null;
-  }
-  contacts[idx] = { ...contacts[idx], ...data };
-  fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-  return contacts[idx];
-};
-
-export default {
-  listContacts,
-  getContactByID,
-  addContact,
-  removeContact,
-  updateContactByID,
-};
+export default Contact;

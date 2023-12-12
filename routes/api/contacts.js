@@ -1,17 +1,19 @@
 import express from "express";
-import contactsController from "../../controllers/contactController.js";
-import isEmptyBody from "../../ middlewars/isEmptyBody.js";
+import contactsController from "../../controllers/contactsController.js.js";
 import validateBody from "../../decorators/bodyValidator.js";
 import {
   addContactSchema,
+  patchContactSchema,
   updateContactSchema,
-} from "../../schemas/contactsSchemas.js";
+} from "../../schemas/contactsSchema.js";
+
+import { isEmptyBody, isValidId } from "../../middlewars/index.js";
 
 const router = express.Router();
 
 router.get("/", contactsController.getAll);
 
-router.get("/:contactId", contactsController.getByID);
+router.get("/:contactId", isValidId, contactsController.getByID);
 
 router.post(
   "/",
@@ -20,12 +22,21 @@ router.post(
   contactsController.add
 );
 
-router.delete("/:contactId", contactsController.deleteByID);
+router.delete("/:contactId", isValidId, contactsController.deleteByID);
 
 router.put(
   "/:contactId",
+  isValidId,
   isEmptyBody,
   validateBody(updateContactSchema),
+  contactsController.update
+);
+
+router.patch(
+  "/:contactId/favorite",
+  isValidId,
+  isEmptyBody,
+  validateBody(patchContactSchema),
   contactsController.update
 );
 
