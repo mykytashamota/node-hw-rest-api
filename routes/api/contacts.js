@@ -37,7 +37,7 @@ router.patch(
   isValidId,
   isEmptyBody,
   validateBody(patchContactSchema),
-  contactsController.update
+  contactsController.updateFavorite
 );
 
 export default router;

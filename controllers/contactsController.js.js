@@ -25,7 +25,7 @@ const deleteByID = async (req, res, next) => {
   const { contactId } = req.params;
   const result = await Contact.findByIdAndDelete(contactId);
   if (!result) {
-    return next(HttpError(404, "Not found"));
+    return next(HttpError(404, "Not found "));
   }
   res.json({ message: "contact deleted" });
 };
@@ -42,10 +42,23 @@ const update = async (req, res, next) => {
   res.json(result);
 };
 
+const updateFavorite = async (req, res, next) => {
+  const { contactId } = req.params;
+  const result = await Contact.findByIdAndUpdate(contactId, req.body, {
+    new: true,
+    runValidators: true,
+  });
+  if (!result) {
+    return next(HttpError(400, "Missing field favorite"));
+  }
+  res.json(result);
+};
+
 export default {
   getAll: wrapController(getAll),
   getByID: wrapController(getByID),
   add: wrapController(add),
   deleteByID: wrapController(deleteByID),
   update: wrapController(update),
+  updateFavorite: wrapController(updateFavorite),
 };
